@@ -2,23 +2,27 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class NoiseVoxelMap : MonoBehaviour
 {
-    [Header("Prefabs")]
-    public GameObject blockPrefab;     // 기본 블록 (예: 흙)
-    public GameObject grassPrefab;     // 잔디 블록 (맨 위층)
-    public GameObject waterPrefab;     // 물 블록 (수면 이하 채움용)
+    [Header("Block Prefabs")]
+    public GameObject blockPrefabDirt;
+    public GameObject blockPrefabGrass;
+    public GameObject blockPrefabWater;
 
-    [Header("Terrain Settings")]
-    public int width = 20;             // 가로 (x)
-    public int depth = 20;             // 세로 (z)
-    public int maxHeight = 16;         // 최대 높이 (y)
-    public int waterLevel = 4;         // 수면 높이
+    [Header("Map Size (X,Z) & Height (Y)")]
+    public int width = 20;     // X
+    public int depth = 20;     // Z
+    public int maxHeight = 16; // Y
 
-    [SerializeField] float noiseScale = 20f; // Perlin Noise 스케일 (값이 높을수록 평평)
+    [Header("Water")]
+    public int waterLevel = 4; // y <= waterLevel 은 물로 채움
+
+    [SerializeField] private float noiseScale = 20f;
 
     void Start()
     {
+        // 노이즈 오프셋(시드 느낌)
         float offsetX = Random.Range(-9999f, 9999f);
         float offsetZ = Random.Range(-9999f, 9999f);
 
@@ -26,39 +30,59 @@ public class NoiseVoxelMap : MonoBehaviour
         {
             for (int z = 0; z < depth; z++)
             {
+                // 0~1 사이의 퍼린 노이즈
                 float nx = (x + offsetX) / noiseScale;
                 float nz = (z + offsetZ) / noiseScale;
-
                 float noise = Mathf.PerlinNoise(nx, nz);
+
+                // 노이즈를 최대 높이에 매핑
                 int h = Mathf.FloorToInt(noise * maxHeight);
+                if (h <= 0) h = 1;
 
-                if (h <= 0) continue;
-
-                // --- 땅 생성 ---
+                // y = 0 ~ h-1 까지는 흙, y = h 는 잔디
                 for (int y = 0; y <= h; y++)
                 {
                     if (y == h)
-                        Place(grassPrefab, x, y, z); // 맨 위는 잔디
+                        PlaceGrass(x, y, z);
                     else
-                        Place(blockPrefab, x, y, z); // 나머지는 흙
+                        PlaceDirt(x, y, z);
                 }
 
-                // --- 물 생성 ---
-                // 땅 높이보다 낮고 waterLevel 이하인 경우 물로 채움
-                if (h < waterLevel)
+                // 수면 이하 부분은 물로 채우기
+                for (int y = h + 1; y <= waterLevel; y++)
                 {
-                    for (int y = h + 1; y <= waterLevel; y++)
-                    {
-                        Place(waterPrefab, x, y, z);
-                    }
+                    PlaceWater(x, y, z);
                 }
             }
         }
     }
 
-    private void Place(GameObject prefab, int x, int y, int z)
+    private void PlaceWater(int x, int y, int z)
     {
-        var go = Instantiate(prefab, new Vector3(x, y, z), Quaternion.identity, transform);
-        go.name = $"{prefab.name}_{x}_{y}_{z}";
+        var go = Instantiate(blockPrefabWater, new Vector3(x, y, z), Quaternion.identity, transform);
+        go.name = $"Water_{x}_{y}_{z}";
+    }
+
+    private void PlaceDirt(int x, int y, int z)
+    {
+        var go = Instantiate(blockPrefabDirt, new Vector3(x, y, z), Quaternion.identity, transform);
+        go.name = $"Dirt_{x}_{y}_{z}";
+      
+        var b = go.GetComponent<Block>() ?? go.AddComponent<Block>();
+        b.type = BlockType.Dirt;
+        b.maxHP = 3;
+        b.dropCount = 1;
+        b.mineable = true;
+    }
+
+    private void PlaceGrass(int x, int y, int z)
+    {
+        var go = Instantiate(blockPrefabGrass, new Vector3(x, y, z), Quaternion.identity, transform);
+        go.name = $"Grass_{x}_{y}_{z}";
+        var b = go.GetComponent<Block>() ?? go.AddComponent<Block>();
+        b.type = BlockType.Grass;
+        b.maxHP = 3;
+        b.dropCount = 1;
+        b.mineable = true;
     }
 }
