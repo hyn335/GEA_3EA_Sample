@@ -20,6 +20,8 @@ public class NoiseVoxelMap : MonoBehaviour
 
     [SerializeField] private float noiseScale = 20f;
 
+   
+
     void Start()
     {
         // 노이즈 오프셋(시드 느낌)
@@ -56,6 +58,24 @@ public class NoiseVoxelMap : MonoBehaviour
             }
         }
     }
+    public void PlaceTile(Vector3Int pos, BlockType type)
+    {
+        switch (type)
+        {
+            case BlockType.Dirt:
+                PlaceDirt(pos.x, pos.y, pos.z);
+                break;
+
+            case BlockType.Grass:
+                PlaceGrass(pos.x, pos.y, pos.z);
+                break;
+
+            case BlockType.Water:
+                PlaceWater(pos.x, pos.y, pos.z);
+                break;
+        }
+    }
+
 
     private void PlaceWater(int x, int y, int z)
     {
@@ -85,4 +105,6 @@ public class NoiseVoxelMap : MonoBehaviour
         b.dropCount = 1;
         b.mineable = true;
     }
+
+   
 }
