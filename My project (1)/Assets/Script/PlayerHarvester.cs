@@ -71,7 +71,7 @@ public class PlayerHarvester : MonoBehaviour
                         Vector3Int placePos = AdjacentCellOnHitFace(hit);
 
 
-                        BlockType selectedType = invenUI.GetInventorySlot();
+                        ItemType selectedType = invenUI.GetInventorySlot();
 
 
                         if (inventory.Consume(selectedType, 1))

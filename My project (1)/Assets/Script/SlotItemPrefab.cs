@@ -2,19 +2,34 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
+using JetBrains.Annotations;
 
-public class SlotItemPrefab : MonoBehaviour
+public class SlotItemPrefab : MonoBehaviour, IPointerClickHandler
 {
     public Image itemImage;
     public TextMeshProUGUI itemText;
-    public BlockType blockType;
+    public ItemType blockType;
+    public CraftingPanel craftingPanel;
 
-    public void ItemSetting(Sprite itemSprite, string txt, BlockType type)
+    public void ItemSetting(Sprite itemSprite, string txt, ItemType type)
     {
         itemImage.sprite = itemSprite;
         itemText.text = txt;
         blockType = type; 
         
+    }
+    private void Awake()
+    {
+        if (!craftingPanel)
+            craftingPanel = FindObjectOfType<CraftingPanel>(true);
+    }
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (eventData.button != PointerEventData.InputButton.Right) return;
+        if (!craftingPanel) return;
+
+        craftingPanel.AddPlanned(blockType, 1);
     }
 
     //인벤토리 업데이트 시 호출 
@@ -28,16 +43,14 @@ public class SlotItemPrefab : MonoBehaviour
         {
             switch (item.Key)
             {
-                case BlockType.Dirt:
-                    //Dirt 아이템을 슬롯에 생성
-                    // instantiate 활용
-
+                case ItemType.Dirt:
+                 
                     break;
-                case BlockType.Grass:
+                case ItemType.Grass:
 
                     break;
 
-                        case BlockType.Water:
+                        case ItemType.Water:
                     break;
             }
         }

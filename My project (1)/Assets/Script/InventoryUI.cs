@@ -11,6 +11,7 @@ public class InventoryUI : MonoBehaviour
     public Sprite grassSprite;
     public Sprite waterSprite;
     public Sprite cloudSprite;
+    public Sprite axeSprite;
     #endregion
 
     // 슬롯 / 아이템 관련
@@ -63,19 +64,22 @@ public class InventoryUI : MonoBehaviour
 
             switch (item.Key) // 블록 타입별 아이템 추가
             {
-                case BlockType.Dirt:
+                case ItemType.Dirt:
                     slotItemPrefab.ItemSetting(dirtSprite, "x" + item.Value.ToString(), item.Key);
                     break;
 
-                case BlockType.Grass:
+                case ItemType.Grass:
                     slotItemPrefab.ItemSetting(grassSprite, "x" + item.Value.ToString(), item.Key);
                     break;
 
-                case BlockType.Water:
+                case ItemType.Water:
                     slotItemPrefab.ItemSetting(waterSprite, "x" + item.Value.ToString(), item.Key);
                     break;
 
-                
+                case ItemType.Axe:
+                    slotItemPrefab.ItemSetting(axeSprite, "x" + item.Value.ToString(), item.Key);
+                    break;
+
             }
 
             idx++; // 다음 슬롯 인덱스
@@ -123,7 +127,7 @@ public class InventoryUI : MonoBehaviour
     }
 
     // 현재 선택된 슬롯의 블록 타입 반환
-    public BlockType GetInventorySlot()
+    public ItemType GetInventorySlot()
     {
         return items[selectedIndex].GetComponent<SlotItemPrefab>().blockType;
     }
