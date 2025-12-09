@@ -182,8 +182,8 @@ MonoBehaviour:
   blockPrefabDirt: {fileID: 4075161206197043648, guid: c78a6af233310ab44b0fbf283d5f5f67, type: 3}
   blockPrefabGrass: {fileID: 3225780383394414201, guid: 5c0ced022bce11a4db0bd3ef3300d0ac, type: 3}
   blockPrefabWater: {fileID: 1547306643745751832, guid: 7ab975e0f59184d4f83dfc6b819773f0, type: 3}
-  width: 20
-  depth: 20
+  width: 30
+  depth: 30
   maxHeight: 16
   waterLevel: 4
   noiseScale: 10
@@ -2000,7 +2000,7 @@ MonoBehaviour:
   grassSprite: {fileID: 21300000, guid: fc40cb82cce9321408058a65675d1722, type: 3}
   waterSprite: {fileID: 21300000, guid: 1b532d8c527a47544a50e75e3e0aa680, type: 3}
   cloudSprite: {fileID: 0}
-  axeSprite: {fileID: 0}
+  axeSprite: {fileID: 21300000, guid: d76e905b5c1921b43a0a1e52bd08ddab, type: 3}
   Slot:
   - {fileID: 1679613773}
   - {fileID: 1499699038}
