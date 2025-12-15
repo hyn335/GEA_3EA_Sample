@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ec9dc6572a13884fbd019c35768aceb, type: 3}
   m_Name: Recipe
   m_EditorClassIdentifier: 
-  displayName: axe
+  displayName: Axe
   inputs:
   - type: 0
     count: 1

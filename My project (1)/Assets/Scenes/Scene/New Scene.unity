@@ -182,8 +182,14 @@ MonoBehaviour:
   blockPrefabDirt: {fileID: 4075161206197043648, guid: c78a6af233310ab44b0fbf283d5f5f67, type: 3}
   blockPrefabGrass: {fileID: 3225780383394414201, guid: 5c0ced022bce11a4db0bd3ef3300d0ac, type: 3}
   blockPrefabWater: {fileID: 1547306643745751832, guid: 7ab975e0f59184d4f83dfc6b819773f0, type: 3}
+  blockPrefabWood: {fileID: 1547306643745751832, guid: 70152cda4058887498a196341ec1c361, type: 3}
+  blockPrefabLeaf: {fileID: 1547306643745751832, guid: 78e3a677404fd7249ba09602e18f675b, type: 3}
+  treeChance: 0.03
+  treeMinHeight: 3
+  treeMaxHeight: 6
+  leafRadius: 2
   width: 30
-  depth: 30
+  depth: 20
   maxHeight: 16
   waterLevel: 4
   noiseScale: 10
@@ -1246,8 +1252,10 @@ MonoBehaviour:
   hitMask:
     serializedVersion: 2
     m_Bits: 8
-  toolDamage: 1
-  hitCooldown: 0.15
+  fistDamage: 1
+  fistCooldown: 0.15
+  axeDamage: 3
+  axeCooldown: 0.1
   inventory: {fileID: 1027090486}
   selectedBlock: {fileID: 438528021}
 --- !u!114 &1027090486
@@ -2001,6 +2009,8 @@ MonoBehaviour:
   waterSprite: {fileID: 21300000, guid: 1b532d8c527a47544a50e75e3e0aa680, type: 3}
   cloudSprite: {fileID: 0}
   axeSprite: {fileID: 21300000, guid: d76e905b5c1921b43a0a1e52bd08ddab, type: 3}
+  WoodSprite: {fileID: 21300000, guid: 167f73f8d17cced4e9c88b643e6a85d6, type: 3}
+  LeafSprite: {fileID: 21300000, guid: 8ee66514e89433b4196ccc92ab3ab22c, type: 3}
   Slot:
   - {fileID: 1679613773}
   - {fileID: 1499699038}

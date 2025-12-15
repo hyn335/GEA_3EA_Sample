@@ -1,7 +1,6 @@
-using System.Collections;
+Ôªøusing System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 
 public class NoiseVoxelMap : MonoBehaviour
 {
@@ -10,21 +9,28 @@ public class NoiseVoxelMap : MonoBehaviour
     public GameObject blockPrefabGrass;
     public GameObject blockPrefabWater;
 
+    [Header("Tree (Trunk + Round Leaves)")]
+    public GameObject blockPrefabWood;
+    public GameObject blockPrefabLeaf;
+    [Range(0f, 1f)] public float treeChance = 0.03f;
+    public int treeMinHeight = 3;
+    public int treeMaxHeight = 6;
+
+    [Header("Leaves Shape")]
+    public int leafRadius = 2; // 2 Ï∂îÏ≤ú, 3ÏùÄ ÌíçÏÑ±
+
     [Header("Map Size (X,Z) & Height (Y)")]
-    public int width = 20;     // X
-    public int depth = 20;     // Z
-    public int maxHeight = 16; // Y
+    public int width = 20;
+    public int depth = 20;
+    public int maxHeight = 16;
 
     [Header("Water")]
-    public int waterLevel = 4; // y <= waterLevel ¿∫ π∞∑Œ √§øÚ
+    public int waterLevel = 4;
 
     [SerializeField] private float noiseScale = 20f;
 
-   
-
     void Start()
     {
-        // ≥Î¿Ã¡Ó ø¿«¡º¬(Ω√µÂ ¥¿≥¶)
         float offsetX = Random.Range(-9999f, 9999f);
         float offsetZ = Random.Range(-9999f, 9999f);
 
@@ -32,32 +38,75 @@ public class NoiseVoxelMap : MonoBehaviour
         {
             for (int z = 0; z < depth; z++)
             {
-                // 0~1 ªÁ¿Ã¿« ∆€∏∞ ≥Î¿Ã¡Ó
                 float nx = (x + offsetX) / noiseScale;
                 float nz = (z + offsetZ) / noiseScale;
                 float noise = Mathf.PerlinNoise(nx, nz);
 
-                // ≥Î¿Ã¡Ó∏¶ √÷¥Î ≥Ù¿Ãø° ∏≈«Œ
                 int h = Mathf.FloorToInt(noise * maxHeight);
                 if (h <= 0) h = 1;
 
-                // y = 0 ~ h-1 ±Ó¡ˆ¥¬ »Î, y = h ¥¬ ¿‹µ
+                // ÎïÖ ÏÉùÏÑ±
                 for (int y = 0; y <= h; y++)
                 {
-                    if (y == h)
-                        PlaceGrass(x, y, z);
-                    else
-                        PlaceDirt(x, y, z);
+                    if (y == h) PlaceGrass(x, y, z);
+                    else PlaceDirt(x, y, z);
                 }
 
-                // ºˆ∏È ¿Ã«œ ∫Œ∫–¿∫ π∞∑Œ √§øÏ±‚
+                // Î¨º Ï±ÑÏö∞Í∏∞
                 for (int y = h + 1; y <= waterLevel; y++)
                 {
                     PlaceWater(x, y, z);
                 }
+
+                // ÎÇòÎ¨¥ + Îë•Í∑º Ïûé
+                TrySpawnTree(x, h, z);
             }
         }
     }
+
+    void TrySpawnTree(int x, int groundY, int z)
+    {
+        if (blockPrefabWood == null) return;
+        if (groundY <= waterLevel) return;
+        if (Random.value > treeChance) return;
+
+        int height = Random.Range(treeMinHeight, treeMaxHeight + 1);
+
+        // Ïûé Î∞òÍµ¨(leafRadius)ÍπåÏßÄ Îßµ ÎÜíÏù¥ Í≥†Î†§
+        height = Mathf.Min(height, maxHeight - groundY - 1 - leafRadius);
+        if (height <= 0) return;
+
+        // Ï§ÑÍ∏∞ ÏÉùÏÑ±
+        for (int i = 1; i <= height; i++)
+        {
+            PlaceWood(x, groundY + i, z);
+        }
+
+        // Îë•Í∑º Ïûé(Î∞òÍµ¨) ÏÉùÏÑ±
+        int topY = groundY + height;
+        SpawnRoundLeaves(x, topY + 1, z, leafRadius);
+    }
+
+         // Îë•Í∏ÄÍ≤å(Î∞òÍµ¨) Ïûé ÏÉùÏÑ±
+    void SpawnRoundLeaves(int cx, int cy, int cz, int radius)
+    {
+        if (blockPrefabLeaf == null) return;
+        if (radius <= 0) return;
+
+        for (int dy = 0; dy <= radius; dy++) // ÏúÑÎ°úÎßå(Î∞òÍµ¨)
+        {
+            int r = radius - dy;
+            int r2 = r * r;
+
+            for (int dx = -r; dx <= r; dx++)
+            for (int dz = -r; dz <= r; dz++)
+            {
+                if (dx * dx + dz * dz > r2) continue;
+                PlaceLeaf(cx + dx, cy + dy, cz + dz);
+            }
+        }
+    }
+
     public void PlaceTile(Vector3Int pos, ItemType type)
     {
         switch (type)
@@ -73,21 +122,34 @@ public class NoiseVoxelMap : MonoBehaviour
             case ItemType.Water:
                 PlaceWater(pos.x, pos.y, pos.z);
                 break;
+
+            case ItemType.Wood:
+                PlaceWood(pos.x, pos.y, pos.z);
+                break;
+
+            case ItemType.Leaf:
+                PlaceLeaf(pos.x, pos.y, pos.z);
+                break;
         }
     }
-
 
     private void PlaceWater(int x, int y, int z)
     {
         var go = Instantiate(blockPrefabWater, new Vector3(x, y, z), Quaternion.identity, transform);
         go.name = $"Water_{x}_{y}_{z}";
+
+        var b = go.GetComponent<Block>() ?? go.AddComponent<Block>();
+        b.type = ItemType.Water;
+        b.maxHP = 2;
+        b.dropCount = 1;
+        b.mineable = true;
     }
 
     private void PlaceDirt(int x, int y, int z)
     {
         var go = Instantiate(blockPrefabDirt, new Vector3(x, y, z), Quaternion.identity, transform);
         go.name = $"Dirt_{x}_{y}_{z}";
-      
+
         var b = go.GetComponent<Block>() ?? go.AddComponent<Block>();
         b.type = ItemType.Dirt;
         b.maxHP = 3;
@@ -99,6 +161,7 @@ public class NoiseVoxelMap : MonoBehaviour
     {
         var go = Instantiate(blockPrefabGrass, new Vector3(x, y, z), Quaternion.identity, transform);
         go.name = $"Grass_{x}_{y}_{z}";
+
         var b = go.GetComponent<Block>() ?? go.AddComponent<Block>();
         b.type = ItemType.Grass;
         b.maxHP = 3;
@@ -106,5 +169,30 @@ public class NoiseVoxelMap : MonoBehaviour
         b.mineable = true;
     }
 
-   
+    private void PlaceWood(int x, int y, int z)
+    {
+        var go = Instantiate(blockPrefabWood, new Vector3(x, y, z), Quaternion.identity, transform);
+        go.name = $"Wood_{x}_{y}_{z}";
+
+        var b = go.GetComponent<Block>() ?? go.AddComponent<Block>();
+        b.type = ItemType.Wood;
+        b.maxHP = 5;
+        b.dropCount = 1;
+        b.mineable = true;
+    }
+
+         //  Ïù¥ Ìï®ÏàòÍ∞Ä Îπ†Ï†∏ÏÑú ÏóêÎü¨ÎÇ¨Îçò Í±∞ÏûÑ (PlaceLeaf ÏóÜÏùå)
+    private void PlaceLeaf(int x, int y, int z)
+    {
+        if (blockPrefabLeaf == null) return;
+
+        var go = Instantiate(blockPrefabLeaf, new Vector3(x, y, z), Quaternion.identity, transform);
+        go.name = $"Leaf_{x}_{y}_{z}";
+
+        var b = go.GetComponent<Block>() ?? go.AddComponent<Block>();
+        b.type = ItemType.Leaf;
+        b.maxHP = 1;
+        b.dropCount = 0;
+        b.mineable = true;
+    }
 }

@@ -12,6 +12,8 @@ public class InventoryUI : MonoBehaviour
     public Sprite waterSprite;
     public Sprite cloudSprite;
     public Sprite axeSprite;
+    public Sprite WoodSprite;
+    public Sprite LeafSprite;
     #endregion
 
     // 슬롯 / 아이템 관련
@@ -79,6 +81,16 @@ public class InventoryUI : MonoBehaviour
                 case ItemType.Axe:
                     slotItemPrefab.ItemSetting(axeSprite, "x" + item.Value.ToString(), item.Key);
                     break;
+
+                case ItemType.Wood:
+                    slotItemPrefab.ItemSetting(WoodSprite, "x" + item.Value.ToString(), item.Key);
+                    break;
+
+                case ItemType.Leaf:
+                    slotItemPrefab.ItemSetting(LeafSprite, "x" + item.Value.ToString(), item.Key);
+                    break;
+
+
 
             }
 
