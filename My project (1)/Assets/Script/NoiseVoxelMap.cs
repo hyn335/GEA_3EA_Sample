@@ -27,6 +27,13 @@ public class NoiseVoxelMap : MonoBehaviour
     [Header("Water")]
     public int waterLevel = 4;
 
+    [Header("Portal Spawn")]
+    public GameObject portalPrefab;
+    public int portalX = 2;
+    public int portalZ = 2;
+    public int portalYOffset = 1;
+
+
     [SerializeField] private float noiseScale = 20f;
 
     void Start()
@@ -60,6 +67,15 @@ public class NoiseVoxelMap : MonoBehaviour
 
                 // 나무 + 둥근 잎
                 TrySpawnTree(x, h, z);
+
+                if (portalPrefab != null && x == portalX && z == portalZ)
+                {
+                    // 지면(잔디 높이 h) 바로 위에 포탈 생성
+                    Vector3 pos = new Vector3(x, h + portalYOffset, z);
+                    Instantiate(portalPrefab, pos, Quaternion.identity, transform);
+                }
+
+
             }
         }
     }
@@ -194,5 +210,25 @@ public class NoiseVoxelMap : MonoBehaviour
         b.maxHP = 1;
         b.dropCount = 0;
         b.mineable = true;
+    }
+
+   
+    void RemoveBlockAt(int x, int y, int z)
+    {
+        // 해당 좌표에 있는 블록(흙/잔디/물 등)을 찾아서 제거
+        var hits = Physics.OverlapBox(
+            new Vector3(x, y, z),
+            Vector3.one * 0.45f,
+            Quaternion.identity
+        );
+
+        foreach (var h in hits)
+        {
+            var b = h.GetComponent<Block>();
+            if (b != null)
+            {
+                Destroy(h.gameObject);
+            }
+        }
     }
 }

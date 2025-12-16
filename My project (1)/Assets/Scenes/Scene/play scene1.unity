@@ -192,6 +192,10 @@ MonoBehaviour:
   depth: 20
   maxHeight: 16
   waterLevel: 4
+  portalPrefab: {fileID: 4402821859037799244, guid: 1951065a2755415479843f6e2b14452e, type: 3}
+  portalX: 2
+  portalZ: 2
+  portalYOffset: 1
   noiseScale: 10
 --- !u!1 &122885496
 GameObject:
