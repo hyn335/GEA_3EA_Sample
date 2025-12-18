@@ -12,8 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ec9dc6572a13884fbd019c35768aceb, type: 3}
   m_Name: Recipe 1
   m_EditorClassIdentifier: 
-  displayName: 
+  displayName: Bomb
   inputs:
-  - type: 0
-    count: 0
-  outputs: []
+  - type: 1
+    count: 2
+  - type: 2
+    count: 2
+  outputs:
+  - type: 8
+    count: 1

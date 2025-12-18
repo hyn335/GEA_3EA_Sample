@@ -14,6 +14,9 @@ public class InventoryUI : MonoBehaviour
     public Sprite axeSprite;
     public Sprite WoodSprite;
     public Sprite LeafSprite;
+    public Sprite BombSprite;
+    public Sprite SnowmanSprite;
+
     #endregion
 
     // 슬롯 / 아이템 관련
@@ -88,6 +91,14 @@ public class InventoryUI : MonoBehaviour
 
                 case ItemType.Leaf:
                     slotItemPrefab.ItemSetting(LeafSprite, "x" + item.Value.ToString(), item.Key);
+                    break;
+
+                case ItemType.Bomb:
+                    slotItemPrefab.ItemSetting(BombSprite, "x" + item.Value.ToString(), item.Key);
+                    break;
+
+                case ItemType.Snowman:
+                    slotItemPrefab.ItemSetting(SnowmanSprite, "x" + item.Value.ToString(), item.Key);
                     break;
 
 

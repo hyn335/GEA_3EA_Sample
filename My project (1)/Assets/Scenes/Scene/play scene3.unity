@@ -179,20 +179,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 73ade045e96c912419f1b7b89f37ef4d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  blockPrefabDirt: {fileID: 4075161206197043648, guid: c78a6af233310ab44b0fbf283d5f5f67, type: 3}
-  blockPrefabGrass: {fileID: 3225780383394414201, guid: 5c0ced022bce11a4db0bd3ef3300d0ac, type: 3}
+  blockPrefabDirt: {fileID: 1547306643745751832, guid: 4e15790a1622e1c4cbf9f94e8985bd51, type: 3}
+  blockPrefabGrass: {fileID: 1547306643745751832, guid: 4e15790a1622e1c4cbf9f94e8985bd51, type: 3}
   blockPrefabWater: {fileID: 1547306643745751832, guid: 7ab975e0f59184d4f83dfc6b819773f0, type: 3}
   blockPrefabWood: {fileID: 1547306643745751832, guid: 70152cda4058887498a196341ec1c361, type: 3}
-  blockPrefabLeaf: {fileID: 1547306643745751832, guid: 78e3a677404fd7249ba09602e18f675b, type: 3}
+  blockPrefabLeaf: {fileID: 1547306643745751832, guid: 4e15790a1622e1c4cbf9f94e8985bd51, type: 3}
   treeChance: 0.03
   treeMinHeight: 3
   treeMaxHeight: 6
   leafRadius: 2
+  snowmanBodyPrefab: {fileID: 703151717937730165, guid: c420c05831675604c82acc39dfbbec6d, type: 3}
+  snowmanHeadPrefab: {fileID: 5880304589556034388, guid: 05a4e7ac0b16dd24aabc87de27abfa92, type: 3}
   width: 30
   depth: 20
   maxHeight: 16
   waterLevel: 4
-  portalPrefab: {fileID: 4402821859037799244, guid: 1951065a2755415479843f6e2b14452e, type: 3}
+  portalPrefab: {fileID: 4402821859037799244, guid: 11b91532ace348342bfd3de98888f6d4, type: 3}
   portalX: 2
   portalZ: 2
   portalYOffset: 1
@@ -1260,6 +1262,9 @@ MonoBehaviour:
   fistCooldown: 0.15
   axeDamage: 3
   axeCooldown: 0.1
+  bombDamage: 999
+  bombCooldown: 0.25
+  bombConsumes: 1
   inventory: {fileID: 1027090486}
   selectedBlock: {fileID: 438528021}
 --- !u!114 &1027090486
@@ -1635,7 +1640,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   inventory: {fileID: 1027090486}
   recipeList:
-  - {fileID: 11400000, guid: 515884fda5f7b754a8906c5bbd16b1a1, type: 2}
+  - {fileID: 11400000, guid: bc66a5f9d3e2e05408fecf386adf9b5c, type: 2}
   root: {fileID: 122885496}
   plannedText: {fileID: 382447781}
   craftButton: {fileID: 706643624}
@@ -2007,14 +2012,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d125cc5b5ee11dc4495b1dd15812aa9f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dirtSprite: {fileID: 21300000, guid: 919f73d2a4b812446ba6f674ee334f8c, type: 3}
+  dirtSprite: {fileID: 21300000, guid: 5fa5f3c732f97d346ba22ec9563d25c7, type: 3}
   diamondSprite: {fileID: 0}
-  grassSprite: {fileID: 21300000, guid: fc40cb82cce9321408058a65675d1722, type: 3}
-  waterSprite: {fileID: 21300000, guid: 1b532d8c527a47544a50e75e3e0aa680, type: 3}
+  grassSprite: {fileID: 21300000, guid: 5fa5f3c732f97d346ba22ec9563d25c7, type: 3}
+  waterSprite: {fileID: 21300000, guid: 2dddc92c38c25704b996d8e786c8da60, type: 3}
   cloudSprite: {fileID: 0}
   axeSprite: {fileID: 21300000, guid: d76e905b5c1921b43a0a1e52bd08ddab, type: 3}
   WoodSprite: {fileID: 21300000, guid: 167f73f8d17cced4e9c88b643e6a85d6, type: 3}
   LeafSprite: {fileID: 21300000, guid: 8ee66514e89433b4196ccc92ab3ab22c, type: 3}
+  BombSprite: {fileID: 0}
+  SnowmanSprite: {fileID: 21300000, guid: 32bd12ee2ffc8ac48aeaf2f52b197aaa, type: 3}
   Slot:
   - {fileID: 1679613773}
   - {fileID: 1499699038}

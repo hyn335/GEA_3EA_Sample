@@ -184,10 +184,12 @@ MonoBehaviour:
   blockPrefabWater: {fileID: 1547306643745751832, guid: 7ab975e0f59184d4f83dfc6b819773f0, type: 3}
   blockPrefabWood: {fileID: 1547306643745751832, guid: 70152cda4058887498a196341ec1c361, type: 3}
   blockPrefabLeaf: {fileID: 1547306643745751832, guid: 78e3a677404fd7249ba09602e18f675b, type: 3}
-  treeChance: 0.03
-  treeMinHeight: 3
-  treeMaxHeight: 6
+  treeChance: 0.02
+  treeMinHeight: 1
+  treeMaxHeight: 2
   leafRadius: 2
+  snowmanBodyPrefab: {fileID: 0}
+  snowmanHeadPrefab: {fileID: 0}
   width: 30
   depth: 20
   maxHeight: 16
@@ -1260,6 +1262,9 @@ MonoBehaviour:
   fistCooldown: 0.15
   axeDamage: 3
   axeCooldown: 0.1
+  bombDamage: 999
+  bombCooldown: 0.25
+  bombConsumes: 1
   inventory: {fileID: 1027090486}
   selectedBlock: {fileID: 438528021}
 --- !u!114 &1027090486
@@ -2015,6 +2020,8 @@ MonoBehaviour:
   axeSprite: {fileID: 21300000, guid: d76e905b5c1921b43a0a1e52bd08ddab, type: 3}
   WoodSprite: {fileID: 21300000, guid: 167f73f8d17cced4e9c88b643e6a85d6, type: 3}
   LeafSprite: {fileID: 21300000, guid: 8ee66514e89433b4196ccc92ab3ab22c, type: 3}
+  BombSprite: {fileID: 0}
+  SnowmanSprite: {fileID: 0}
   Slot:
   - {fileID: 1679613773}
   - {fileID: 1499699038}

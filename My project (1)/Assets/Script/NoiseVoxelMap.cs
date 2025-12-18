@@ -17,7 +17,11 @@ public class NoiseVoxelMap : MonoBehaviour
     public int treeMaxHeight = 6;
 
     [Header("Leaves Shape")]
-    public int leafRadius = 2; // 2 추천, 3은 풍성
+    public int leafRadius = 2;
+
+    [Header("Snowman Prefabs")]
+    public GameObject snowmanBodyPrefab; // 아래
+    public GameObject snowmanHeadPrefab; // 위
 
     [Header("Map Size (X,Z) & Height (Y)")]
     public int width = 20;
@@ -32,7 +36,6 @@ public class NoiseVoxelMap : MonoBehaviour
     public int portalX = 2;
     public int portalZ = 2;
     public int portalYOffset = 1;
-
 
     [SerializeField] private float noiseScale = 20f;
 
@@ -52,30 +55,24 @@ public class NoiseVoxelMap : MonoBehaviour
                 int h = Mathf.FloorToInt(noise * maxHeight);
                 if (h <= 0) h = 1;
 
-                // 땅 생성
                 for (int y = 0; y <= h; y++)
                 {
                     if (y == h) PlaceGrass(x, y, z);
                     else PlaceDirt(x, y, z);
                 }
 
-                // 물 채우기
                 for (int y = h + 1; y <= waterLevel; y++)
                 {
                     PlaceWater(x, y, z);
                 }
 
-                // 나무 + 둥근 잎
                 TrySpawnTree(x, h, z);
 
                 if (portalPrefab != null && x == portalX && z == portalZ)
                 {
-                    // 지면(잔디 높이 h) 바로 위에 포탈 생성
                     Vector3 pos = new Vector3(x, h + portalYOffset, z);
                     Instantiate(portalPrefab, pos, Quaternion.identity, transform);
                 }
-
-
             }
         }
     }
@@ -87,29 +84,21 @@ public class NoiseVoxelMap : MonoBehaviour
         if (Random.value > treeChance) return;
 
         int height = Random.Range(treeMinHeight, treeMaxHeight + 1);
-
-        // 잎 반구(leafRadius)까지 맵 높이 고려
         height = Mathf.Min(height, maxHeight - groundY - 1 - leafRadius);
         if (height <= 0) return;
 
-        // 줄기 생성
         for (int i = 1; i <= height; i++)
-        {
             PlaceWood(x, groundY + i, z);
-        }
 
-        // 둥근 잎(반구) 생성
         int topY = groundY + height;
         SpawnRoundLeaves(x, topY + 1, z, leafRadius);
     }
 
-         // 둥글게(반구) 잎 생성
     void SpawnRoundLeaves(int cx, int cy, int cz, int radius)
     {
         if (blockPrefabLeaf == null) return;
-        if (radius <= 0) return;
 
-        for (int dy = 0; dy <= radius; dy++) // 위로만(반구)
+        for (int dy = 0; dy <= radius; dy++)
         {
             int r = radius - dy;
             int r2 = r * r;
@@ -123,37 +112,70 @@ public class NoiseVoxelMap : MonoBehaviour
         }
     }
 
+    // =========================
+    // 설치 처리
+    // =========================
     public void PlaceTile(Vector3Int pos, ItemType type)
     {
         switch (type)
         {
-            case ItemType.Dirt:
-                PlaceDirt(pos.x, pos.y, pos.z);
-                break;
+            case ItemType.Dirt: PlaceDirt(pos.x, pos.y, pos.z); break;
+            case ItemType.Grass: PlaceGrass(pos.x, pos.y, pos.z); break;
+            case ItemType.Water: PlaceWater(pos.x, pos.y, pos.z); break;
+            case ItemType.Wood: PlaceWood(pos.x, pos.y, pos.z); break;
+            case ItemType.Leaf: PlaceLeaf(pos.x, pos.y, pos.z); break;
 
-            case ItemType.Grass:
-                PlaceGrass(pos.x, pos.y, pos.z);
-                break;
-
-            case ItemType.Water:
-                PlaceWater(pos.x, pos.y, pos.z);
-                break;
-
-            case ItemType.Wood:
-                PlaceWood(pos.x, pos.y, pos.z);
-                break;
-
-            case ItemType.Leaf:
-                PlaceLeaf(pos.x, pos.y, pos.z);
+            case ItemType.Snowman:
+                PlaceSnowman(pos);
                 break;
         }
     }
 
-    private void PlaceWater(int x, int y, int z)
+    // =========================
+    // ☃️ 눈사람 설치 (2칸 + 부모 묶기 + 타입 세팅)
+    // =========================
+    public bool PlaceSnowman(Vector3Int basePos)
+    {
+        if (snowmanBodyPrefab == null || snowmanHeadPrefab == null) return false;
+
+        Vector3Int bodyPos = basePos;
+        Vector3Int headPos = basePos + Vector3Int.up;
+
+        if (IsOccupied(bodyPos) || IsOccupied(headPos)) return false;
+
+        // 부모 오브젝트 생성(머리 부수면 전체 파괴를 안정적으로)
+        GameObject root = new GameObject($"Snowman_{basePos.x}_{basePos.y}_{basePos.z}");
+        root.transform.SetParent(transform);
+        root.transform.position = Vector3.zero;
+
+        // 몸통
+        var body = Instantiate(snowmanBodyPrefab, (Vector3)bodyPos, Quaternion.identity, root.transform);
+        var bodyBlock = body.GetComponent<Block>() ?? body.AddComponent<Block>();
+        bodyBlock.type = ItemType.SnowmanBody;
+
+        // 머리
+        var head = Instantiate(snowmanHeadPrefab, (Vector3)headPos, Quaternion.identity, root.transform);
+        var headBlock = head.GetComponent<Block>() ?? head.AddComponent<Block>();
+        headBlock.type = ItemType.SnowmanHead;
+
+        return true;
+    }
+
+    bool IsOccupied(Vector3Int pos)
+    {
+        var hits = Physics.OverlapBox((Vector3)pos, Vector3.one * 0.45f);
+        foreach (var h in hits)
+            if (h.GetComponent<Block>() != null) return true;
+
+        return false;
+    }
+
+    // =========================
+    // 블록 생성 함수들
+    // =========================
+    void PlaceWater(int x, int y, int z)
     {
         var go = Instantiate(blockPrefabWater, new Vector3(x, y, z), Quaternion.identity, transform);
-        go.name = $"Water_{x}_{y}_{z}";
-
         var b = go.GetComponent<Block>() ?? go.AddComponent<Block>();
         b.type = ItemType.Water;
         b.maxHP = 2;
@@ -161,11 +183,9 @@ public class NoiseVoxelMap : MonoBehaviour
         b.mineable = true;
     }
 
-    private void PlaceDirt(int x, int y, int z)
+    void PlaceDirt(int x, int y, int z)
     {
         var go = Instantiate(blockPrefabDirt, new Vector3(x, y, z), Quaternion.identity, transform);
-        go.name = $"Dirt_{x}_{y}_{z}";
-
         var b = go.GetComponent<Block>() ?? go.AddComponent<Block>();
         b.type = ItemType.Dirt;
         b.maxHP = 3;
@@ -173,11 +193,9 @@ public class NoiseVoxelMap : MonoBehaviour
         b.mineable = true;
     }
 
-    private void PlaceGrass(int x, int y, int z)
+    void PlaceGrass(int x, int y, int z)
     {
         var go = Instantiate(blockPrefabGrass, new Vector3(x, y, z), Quaternion.identity, transform);
-        go.name = $"Grass_{x}_{y}_{z}";
-
         var b = go.GetComponent<Block>() ?? go.AddComponent<Block>();
         b.type = ItemType.Grass;
         b.maxHP = 3;
@@ -185,11 +203,9 @@ public class NoiseVoxelMap : MonoBehaviour
         b.mineable = true;
     }
 
-    private void PlaceWood(int x, int y, int z)
+    void PlaceWood(int x, int y, int z)
     {
         var go = Instantiate(blockPrefabWood, new Vector3(x, y, z), Quaternion.identity, transform);
-        go.name = $"Wood_{x}_{y}_{z}";
-
         var b = go.GetComponent<Block>() ?? go.AddComponent<Block>();
         b.type = ItemType.Wood;
         b.maxHP = 5;
@@ -197,38 +213,14 @@ public class NoiseVoxelMap : MonoBehaviour
         b.mineable = true;
     }
 
-         //  이 함수가 빠져서 에러났던 거임 (PlaceLeaf 없음)
-    private void PlaceLeaf(int x, int y, int z)
+    void PlaceLeaf(int x, int y, int z)
     {
         if (blockPrefabLeaf == null) return;
-
         var go = Instantiate(blockPrefabLeaf, new Vector3(x, y, z), Quaternion.identity, transform);
-        go.name = $"Leaf_{x}_{y}_{z}";
-
         var b = go.GetComponent<Block>() ?? go.AddComponent<Block>();
         b.type = ItemType.Leaf;
         b.maxHP = 1;
         b.dropCount = 0;
         b.mineable = true;
-    }
-
-   
-    void RemoveBlockAt(int x, int y, int z)
-    {
-        // 해당 좌표에 있는 블록(흙/잔디/물 등)을 찾아서 제거
-        var hits = Physics.OverlapBox(
-            new Vector3(x, y, z),
-            Vector3.one * 0.45f,
-            Quaternion.identity
-        );
-
-        foreach (var h in hits)
-        {
-            var b = h.GetComponent<Block>();
-            if (b != null)
-            {
-                Destroy(h.gameObject);
-            }
-        }
     }
 }
